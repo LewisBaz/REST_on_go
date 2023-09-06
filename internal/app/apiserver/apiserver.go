@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"main/internal/app/store/sqlstore"
 	"net/http"
+
+	"github.com/gorilla/sessions"
 )
 
 func Start(c *Config) error {
@@ -16,7 +18,8 @@ func Start(c *Config) error {
 	defer db.Close()
 
 	store := sqlstore.New(db)
-	srv := newServer(store)
+	sessionsStore := sessions.NewCookieStore([]byte(c.SessionKey))
+	srv := newServer(store, sessionsStore)
 
 	return http.ListenAndServe(c.BindAddress, srv)
 }
